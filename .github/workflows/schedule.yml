@@ -1,0 +1,26 @@
+name: AutoPunch Scheduled Execution
+
+on:
+  schedule:
+    # Runs at 10:00 AM IST daily (4:30 AM UTC)
+    - cron: '30 4 * * *'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  run-autopunch:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Trigger Netlify Function
+      run: |
+        curl -X POST \
+          -H "Content-Type: application/json" \
+          -d '{"scheduled": true}' \
+          ${{ secrets.NETLIFY_FUNCTION_URL }}
+      
+    - name: Check Status
+      run: |
+        echo "AutoPunch execution triggered successfully"
+        echo "Check your Netlify function logs for details"

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoPunch - Live Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .status-card {
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .schedule-card {
+            border-left: 4px solid #2196F3;
+        }
+        
+        .logs-card {
+            border-left: 4px solid #FF9800;
+        }
+        
+        .controls-card {
+            border-left: 4px solid #9C27B0;
+        }
+        
+        .time-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 10px 0;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        .btn-info {
+            background: #2196F3;
+        }
+        
+        .btn-info:hover {
+            background: #1976D2;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background: #4CAF50;
+        }
+        
+        .status-offline {
+            background: #f44336;
+        }
+        
+        .log-entry {
+            background: #f9f9f9;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .notification.success {
+            background: #4CAF50;
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AutoPunch Dashboard</h1>
+            <p>Automated Attendance System - Live on Netlify</p>
+            <div class="time-display" id="currentTime"></div>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card status-card">
+                <h3><span class="status-indicator status-online"></span>System Status</h3>
+                <div id="systemStatus">
+                    <p>Status: <strong>Online</strong></p>
+                    <p>Environment: <strong>Production</strong></p>
+                    <p>Timezone: <strong>Asia/Kolkata (IST)</strong></p>
+                </div>
+            </div>
+            
+            <div class="card schedule-card">
+                <h3>📅 Schedule</h3>
+                <div class="schedule-item">
+                    <span>Punch In</span>
+                    <strong>10:00 AM IST</strong>
+                </div>
+                <div class="schedule-item">
+                    <span>Punch Out</span>
+                    <strong>6:00 PM IST</strong>
+                </div>
+                <small style="color: #666;">
+                    Scheduled via external cron service for reliable execution
+                </small>
+            </div>
+            
+            <div class="card controls-card">
+                <h3>⚡ Manual Controls</h3>
+                <button class="btn btn-success" onclick="manualTrigger('punch-in')">
+                    🔄 Manual Punch In
+                </button>
+                <button class="btn btn-success" onclick="manualTrigger('punch-out')">
+                    🔄 Manual Punch Out
+                </button>
+                <button class="btn btn-info" onclick="refreshStatus()">
+                    📊 Refresh Status
+                </button>
+            </div>
+            
+            <div class="card logs-card">
+                <h3>📋 Today's Activity</h3>
+                <div id="todayLogs">
+                    <div class="loading">Loading...</div>
+                </div>
+                <button class="btn" onclick="viewLogs()">View Full Logs</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const istTime = now.toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            document.getElementById('currentTime').textContent = istTime + ' IST';
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Manual trigger
+        async function manualTrigger(type) {
+            try {
+                showNotification(`Triggering ${type}...`, 'success');
+                
+                const response = await fetch('/.netlify/functions/manual-trigger', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ type: type })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(`${type} completed successfully!`, 'success');
+                    loadTodayLogs();
+                } else {
+                    showNotification(`${type} failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Load today's logs
+        async function loadTodayLogs() {
+            try {
+                const response = await fetch('/.netlify/functions/status');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const logsDiv = document.getElementById('todayLogs');
+                    const data = result.data;
+                    
+                    if (data.todayReports.length === 0) {
+                        logsDiv.innerHTML = '<p>No activity today</p>';
+                    } else {
+                        let html = `<p><strong>${data.todayCount} executions today (${data.todaySuccessCount} successful)</strong></p>`;
+                        
+                        data.todayReports.slice(-5).forEach(report => {
+                            const status = report.success ? '✅' : '❌';
+                            const time = new Date(report.timestamp).toLocaleTimeString('en-IN');
+                            html += `<div class="log-entry">${status} ${time} - ${report.success ? 'Success' : 'Failed'}</div>`;
+                        });
+                        
+                        logsDiv.innerHTML = html;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                document.getElementById('todayLogs').innerHTML = '<p>Error loading logs</p>';
+            }
+        }
+        
+        // View full logs
+        function viewLogs() {
+            window.open('/.netlify/functions/status', '_blank');
+        }
+        
+        // Refresh status
+        function refreshStatus() {
+            loadTodayLogs();
+            showNotification('Status refreshed!', 'success');
+        }
+        
+        // Initialize
+        updateTime();
+        loadTodayLogs();
+        
+        // Update time every second
+        setInterval(updateTime, 1000);
+        
+        // Auto-refresh logs every 5 minutes
+        setInterval(loadTodayLogs, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

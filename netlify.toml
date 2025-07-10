@@ -1,0 +1,34 @@
+[build]
+  functions = "functions"
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["selenium-webdriver", "chromedriver", "puppeteer"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production.environment]
+  NODE_ENV = "production"
+  BROWSER_HEADLESS = "true"
+  BROWSER_TIMEOUT = "60000"
+
+# Netlify Functions Configuration
+[[functions]]
+  path = "functions/punch-scheduler.js"
+  schedule = "@daily"
+
+[[functions]]
+  path = "functions/manual-trigger.js"
+
+[[functions]]
+  path = "functions/status.js"

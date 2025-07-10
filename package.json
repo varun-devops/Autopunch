@@ -1,0 +1,49 @@
+{
+  "name": "autopunch-crawler",
+  "version": "1.0.0",
+  "description": "Automated web crawler for login, button clicking, and PDF reporting",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node test.js",
+    "test-manual": "node functions/manual-trigger.js",
+    "test-scheduler": "node functions/punch-scheduler.js",
+    "build": "node build.js",
+    "serve": "netlify-lambda serve functions",
+    "setup": "setup.bat",
+    "deploy-check": "node deploy-check.js"
+  },
+  "keywords": [
+    "web-crawler",
+    "automation",
+    "selenium",
+    "pdf-generator",
+    "scheduler"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "chromedriver": "^119.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "fs-extra": "^11.1.1",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.6.0",
+    "netlify-lambda": "^2.0.16",
+    "node-cron": "^3.0.3",
+    "path": "^0.12.7",
+    "puppeteer": "^21.5.0",
+    "selenium-webdriver": "^4.34.0",
+    "serverless-http": "^3.2.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
