@@ -1,3 +1,4 @@
+# Netlify Configuration for AutoPunch Live
 [build]
   functions = "functions"
   command = "npm run build"
@@ -5,7 +6,9 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["selenium-webdriver", "chromedriver", "puppeteer"]
+  
+[build.environment]
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/api/*"
@@ -21,14 +24,3 @@
   NODE_ENV = "production"
   BROWSER_HEADLESS = "true"
   BROWSER_TIMEOUT = "60000"
-
-# Netlify Functions Configuration
-[[functions]]
-  path = "functions/punch-scheduler.js"
-  schedule = "@daily"
-
-[[functions]]
-  path = "functions/manual-trigger.js"
-
-[[functions]]
-  path = "functions/status.js"
