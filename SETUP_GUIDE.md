@@ -68,8 +68,8 @@ npm run test-email
 All settings are in `.env` file:
 ```env
 TARGET_URL=https://telesyssoftware.securtime.adp.com/login?redirectUrl=%2Fdashboard
-LOGIN_USERNAME=varun.singh@telesys.com
-LOGIN_PASSWORD=King@123
+LOGIN_USERNAME=email
+LOGIN_PASSWORD=password
 BROWSER_HEADLESS=false
 ```
 
