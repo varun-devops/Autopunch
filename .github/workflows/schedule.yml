@@ -14,11 +14,27 @@ jobs:
     
     steps:
     - name: Trigger Netlify Function
+      id: trigger
       run: |
-        curl -X POST \
+        echo "Attempting to trigger Netlify function..."
+        response=$(curl -s -w "\n%{http_code}" -X POST \
           -H "Content-Type: application/json" \
           -d '{"scheduled": true}' \
-          ${{ secrets.NETLIFY_FUNCTION_URL }}
+          --max-time 30 \
+          ${{ secrets.NETLIFY_FUNCTION_URL }})
+        
+        status_code=$(echo "$response" | tail -n1)
+        body=$(echo "$response" | sed '$d')
+        
+        echo "Response body: $body"
+        echo "Status code: $status_code"
+        
+        if [ "$status_code" -ge 200 ] && [ "$status_code" -lt 300 ]; then
+          echo "Function triggered successfully!"
+        else
+          echo "::error::Failed to trigger function. Status code: $status_code, Response: $body"
+          exit 1
+        fi
       
     - name: Check Status
       run: |

@@ -190,6 +190,20 @@ npm run logs
 type logs\autopunch.log
 ```
 
+## Troubleshooting GitHub Actions Workflow
+
+If the scheduled GitHub Action is failing, check the following:
+
+1. **Netlify Function URL**: Verify that the `NETLIFY_FUNCTION_URL` secret in GitHub repository settings is correct and the function is deployed.
+
+2. **Function Logs**: Check the Netlify function logs for any errors that might be occurring when the function is triggered.
+
+3. **Function Timeout**: Ensure your Netlify function isn't timing out. The default timeout is 10 seconds, which might not be enough for some operations.
+
+4. **Manual Testing**: Try manually triggering the function using curl or Postman to verify it works outside of GitHub Actions.
+
+5. **Network Access**: Ensure the Netlify function is publicly accessible and doesn't have IP restrictions that would block GitHub Action runners.
+
 ## License
 
 MIT License - see LICENSE file for details.
